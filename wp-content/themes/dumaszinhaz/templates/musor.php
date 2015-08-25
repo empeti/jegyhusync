@@ -61,8 +61,30 @@
             elseif ($musor->jegy_hu_status == 3):?>
                 <p class="eloadas-elmarad">Elmarad az előadás</p>
 
+
+                <?php  // következő elérhető előadás linkje
+                if (!empty($musor->kovetkezo_eloadas)):?>
+                    <p class="kovetkezo-eloadas">
+                        <span class="kovetkezo-eloadas-text">Következő hasonló előadás:</span><br />
+                                        <span class="kovetkezo-eloadas-cim">
+                                            <a href="<?php echo get_bloginfo('url').'/musor/?seo='.$musor->kovetkezo_eloadas->seo?>"><?php echo $musor->kovetkezo_eloadas->cim.' - '.$musor->kovetkezo_eloadas->ido?></a>
+                                        </span>
+                    </p>
+                <?php endif ?>
+
             <?php // elfogyott a jegy
             elseif ($musor->jegy_elfogyott == 1): ?>
                 <p class="jegy-elfogyott">Minden jegy elkelt</p>
+
+
+                <?php  // következő elérhető előadás linkje
+                if (!empty($musor->kovetkezo_eloadas)):?>
+                    <p class="kovetkezo-eloadas">
+                        <span class="kovetkezo-eloadas-text">Következő hasonló előadás:</span><br />
+                                        <span class="kovetkezo-eloadas-cim">
+                                            <a href="<?php echo get_bloginfo('url').'/musor/?seo='.$musor->kovetkezo_eloadas->seo?>"><?php echo $musor->kovetkezo_eloadas->cim.' - '.$musor->kovetkezo_eloadas->ido?></a>
+                                        </span>
+                    </p>
+                <?php endif ?>
             <?php endif;?>
     </div>

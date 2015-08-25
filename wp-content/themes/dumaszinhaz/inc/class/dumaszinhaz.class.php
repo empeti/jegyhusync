@@ -196,6 +196,9 @@
                 // előadás alkotók
                 $rs->alkotok = $this->getEloadasAlkotok($rs->eloadas_id, true);
 
+                // következő előadás
+                $rs->kovetkezo_eloadas = $this->getKovetkezoEloadas($rs);
+
                 return $rs;
             }
             catch (\Exception $e){
@@ -226,8 +229,9 @@
                 }
 
                 foreach ($rs as $musor){
-                    $musor->alkotok = $this->getEloadasAlkotok($musor->eloadas_id, false);
-                    $musorok[]      = $musor;
+                    $musor->alkotok           = $this->getEloadasAlkotok($musor->eloadas_id, false);
+                    $musor->kovetkezo_eloadas = $this->getKovetkezoEloadas($musor);
+                    $musorok[]                = $musor;
                 }
 
                 return $musorok;
@@ -344,6 +348,25 @@
 
             return $kepek;
 
+        }
+
+        /**
+         * Visszaadja a következő alőadást adott programból, ha elfogyott a jegy, vagy elmarad az előadás
+         *
+         * @param object $musor
+         *
+         * @return object | false
+         */
+        private function getKovetkezoEloadas($musor){
+            // ha nem fogyott el a jegy és nem marad el az előadás sem, akkor nem kell lekérni a következő előadást
+            if ($musor->jegy_elfogyott == 0 && $musor->jegy_hu_status == 1){
+                return false;
+            }
+
+            $sql = "SELECT * FROM `musor` WHERE `eloadas_id` = '".$musor->eloadas_id."' AND `ido` > '".$musor->ido."' AND `jegy_elfogyott` = '0' AND `jegy_hu_status` = '1' ORDER BY `ido` ASC LIMIT 1";
+            $rs  = $this->wpdb->get_row($sql);
+
+            return $rs;
         }
 
         /**
