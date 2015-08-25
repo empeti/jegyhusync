@@ -204,6 +204,8 @@
             catch (\Exception $e){
                 $this->log($e->getFile().' hiba a '.$e->getLine().'. sorban:'.$e->getMessage());
                 return false;
+
+                echo '';
             }
 
         }
