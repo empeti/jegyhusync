@@ -842,11 +842,12 @@
             // ár beállítás
             $ar = 0;
             if (!empty($this->prices[$event['NetProgram_Id']])){
-                $ar = $this->prices[$event['NetProgram_Id']];
+                $ar = str_replace(' ','',
+                        str_replace('Ft','',$this->prices[$event['NetProgram_Id']]));
             }
 
             // seo url generálás
-            $seo = $event['NameURL'].'-'                                    // jegy.hu seo URL
+            $seo = $event['NameURL'].'-'                                 // jegy.hu seo URL
                 .$this->normalize($varos).'-'                            // város
                 .substr(                                                 // időpont
                     str_replace(' ','-',
@@ -875,9 +876,10 @@
                                 `jegyrendeles`   = '1',
                                 `jegy_hu_id`     = '".$this->_e($event['NetEvent_Id'])."',
                                 `eloadas_id`     = '".$this->_e($this->programIDs[$event['NetProgram_Id']])."',
+                                `jegy_hu_status` = '".$this->_e($event['EventStatus_Id'])."',
+                                `jegy_elfogyott` = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
                                 `ar`             = '".$this->_e($ar)."',
-                                `status`         = '1',
-                                `jegy_hu_status` = '".$this->_e($event['TicketAvailable'])."'";
+                                `status`         = '1'";
             $sql .= $where;
 
             if ($this->wpdb->query($sql) === false){
@@ -1098,6 +1100,13 @@
 
             if (!$this->isFieldInTable('varos','musor')){
                 $sql = "ALTER TABLE `musor` ADD `varos` VARCHAR(512) NOT NULL AFTER `helyszin`;";
+                if (!$this->wpdb->query($sql)){
+                    throw new \Exception($this->wpdb->last_error.'!');
+                }
+            }
+
+            if (!$this->isFieldInTable('jegy_elfogyott','musor')){
+                $sql = "ALTER TABLE `musor` ADD `jegy_elfogyott` TINYINT(1) NOT NULL AFTER `jegyrendeles`;";
                 if (!$this->wpdb->query($sql)){
                     throw new \Exception($this->wpdb->last_error.'!');
                 }
