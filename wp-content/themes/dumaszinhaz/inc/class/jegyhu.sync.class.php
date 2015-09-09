@@ -509,7 +509,7 @@
                             `txt`           = '',
                             `bemutatkozas`  = '".$this->_e($p['info'])."',
                             `onkritika`     = '',
-                            `vendeg`        = '".(preg_match('/Dumaszínház társulati tag/i',$p['info'])?'0':'1')."',
+                            `vendeg`        = '".(preg_match('/Dumasz&iacute;nh&aacute;z t&aacute;rsulat&aacute;nak tagja/i',$p['info'])?'0':'1')."',
                             `status`        = '1'";
             $sql .= $where;
 
