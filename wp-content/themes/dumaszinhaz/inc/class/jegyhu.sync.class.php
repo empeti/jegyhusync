@@ -509,7 +509,7 @@
                             `txt`           = '',
                             `bemutatkozas`  = '".$this->_e($p['info'])."',
                             `onkritika`     = '',
-                            `vendeg`        = '0',
+                            `vendeg`        = '".(preg_match('/Dumaszínház társulati tag/i',$p['info'])?'0':'1')."',
                             `status`        = '1'";
             $sql .= $where;
 
@@ -866,6 +866,7 @@
             }
 
             $sql .= " `musor` SET
+                                `helyszin_nev`   = '".$this->_e($event['AuditName'])."',
                                 `helyszin`       = '".$this->_e($helyszin)."',
                                 `varos`          = '".$this->_e($varos)."',
                                 `ido`            = '".$this->_e($event['EventDate'])."',
@@ -879,6 +880,7 @@
                                 `jegy_hu_status` = '".$this->_e($event['EventStatus_Id'])."',
                                 `jegy_elfogyott` = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
                                 `ar`             = '".$this->_e($ar)."',
+                                `dumaklub`       = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
                                 `status`         = '1'";
             $sql .= $where;
 
@@ -1109,6 +1111,13 @@
                 $sql = "ALTER TABLE `musor` ADD `jegy_elfogyott` TINYINT(1) NOT NULL AFTER `jegyrendeles`;";
                 if (!$this->wpdb->query($sql)){
                     throw new \Exception($this->wpdb->last_error.'!');
+                }
+            }
+
+            if (!$this->isFieldInTable('helyszin_nev','musor')){
+                $sql = "ALTER TABLE `musor` ADD `helyszin_nev` VARCHAR(512) NOT NULL AFTER `helyszin_id`;";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
                 }
             }
         }
