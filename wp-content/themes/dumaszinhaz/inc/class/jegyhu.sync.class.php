@@ -866,22 +866,23 @@
             }
 
             $sql .= " `musor` SET
-                                `helyszin_nev`   = '".$this->_e($event['AuditName'])."',
-                                `helyszin`       = '".$this->_e($helyszin)."',
-                                `varos`          = '".$this->_e($varos)."',
-                                `ido`            = '".$this->_e($event['EventDate'])."',
-                                `cim`            = '".$this->_e($event['ProgramName'])."',
-                                `seo`            = '".$this->_e($seo)."',
-                                `kiemelt_kep`    = '".$this->_e($event['ThumbURL'])."',
-                                `informacio`     = '".$this->_e($event['ShortDescription'])."',
-                                `jegyrendeles`   = '1',
-                                `jegy_hu_id`     = '".$this->_e($event['NetEvent_Id'])."',
-                                `eloadas_id`     = '".$this->_e($this->programIDs[$event['NetProgram_Id']])."',
-                                `jegy_hu_status` = '".$this->_e($event['EventStatus_Id'])."',
-                                `jegy_elfogyott` = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
-                                `ar`             = '".$this->_e($ar)."',
-                                `dumaklub`       = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
-                                `status`         = '1'";
+                                `helyszin_nev`      = '".$this->_e($event['AuditName'])."',
+                                `helyszin`          = '".$this->_e($helyszin)."',
+                                `varos`             = '".$this->_e($varos)."',
+                                `ido`               = '".$this->_e($event['EventDate'])."',
+                                `cim`               = '".$this->_e($event['ProgramName'])."',
+                                `seo`               = '".$this->_e($seo)."',
+                                `kiemelt_kep`       = '".$this->_e($event['ThumbURL'])."',
+                                `informacio`        = '".$this->_e($event['ShortDescription'])."',
+                                `jegyrendeles`      = '1',
+                                `jegy_hu_id`        = '".$this->_e($event['NetEvent_Id'])."',
+                                `jegy_hu_audit_id`  = '".$this->_e($event['Audit_Id'])."',
+                                `eloadas_id`        = '".$this->_e($this->programIDs[$event['NetProgram_Id']])."',
+                                `jegy_hu_status`    = '".$this->_e($event['EventStatus_Id'])."',
+                                `jegy_elfogyott`    = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
+                                `ar`                = '".$this->_e($ar)."',
+                                `dumaklub`          = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
+                                `status`            = '1'";
             $sql .= $where;
 
             if ($this->wpdb->query($sql) === false){
@@ -1116,6 +1117,13 @@
 
             if (!$this->isFieldInTable('helyszin_nev','musor')){
                 $sql = "ALTER TABLE `musor` ADD `helyszin_nev` VARCHAR(512) NOT NULL AFTER `helyszin_id`;";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
+                }
+            }
+
+            if (!$this->isFieldInTable('jegy_hu_audit_id','musor')){
+                $sql = "ALTER TABLE `musor` ADD `jegy_hu_audit_id` VARCHAR(512) NOT NULL AFTER `jegy_hu_id`;";
                 if (!$this->wpdb->query($sql)){
                     throw new \EXception($this->wpdb->last_error.'!');
                 }
