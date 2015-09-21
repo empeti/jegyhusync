@@ -56,9 +56,9 @@
             catch (\Exception $e){
                 $this->log($e->getFile().' hiba a '.$e->getLine().'. sorban: '.$e->getMessage());
             }
-            finally {
+            //finally {
                 $this->log(' ************* Szinkron vége ************* '."\r\n");
-            }
+            //}
         }
 
         /**
@@ -876,7 +876,7 @@
                                 `informacio`        = '".$this->_e($event['ShortDescription'])."',
                                 `jegyrendeles`      = '1',
                                 `jegy_hu_id`        = '".$this->_e($event['NetEvent_Id'])."',
-                                `jegy_hu_audit_id`  = '".$this->_e($event['Audit_Id'])."',
+                                `jegy_hu_audit_id`  = '".$this->_e($event['NetAudit_Id'])."',
                                 `eloadas_id`        = '".$this->_e($this->programIDs[$event['NetProgram_Id']])."',
                                 `jegy_hu_status`    = '".$this->_e($event['EventStatus_Id'])."',
                                 `jegy_elfogyott`    = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
