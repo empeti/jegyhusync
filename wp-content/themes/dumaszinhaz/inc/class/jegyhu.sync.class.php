@@ -13,6 +13,11 @@
         var $addresses;
 
         /**
+         * @var array a db-ben lévő előadások timestampjei egy tömbben jegy_hu_id-ra indexelve
+         */
+        var $existedEventsTS;
+
+        /**
          * @var array ide gyűjjük a színészek jegy.hu id-jához tartozó belső id-kat
          */
         var $personIDs;
@@ -50,6 +55,7 @@
 
                 // módosítsuk az adatbázist, ha szükséges
                 $this->updateDB();
+                $this->loadExistedEventsTS();
                 $this->syncEvents();
                 $this->saveLastSync();
             }
@@ -93,9 +99,13 @@
                 foreach ($results['payload']['Events'] as $event){
                     $events[] = $event;
 
-                    // program id - minden programot csak egyszer szinronizáljunk
-                    if (!in_array($event['NetProgram_Id'],$programs)){
-                        $programs[] = $event['NetProgram_Id'];
+                    // csak akkor kell szinkronolni a programokat, ha az előadás timestampje kisebb, mint a
+                    // jegy.hu api-ban található timestamp
+                    if ($event['LastModMax'] > $this->existedEventsTS[$event['NetEvent_Id']]){
+                        // program id - minden programot csak egyszer szinronizáljunk
+                        if (!in_array($event['NetProgram_Id'],$programs)){
+                            $programs[] = $event['NetProgram_Id'];
+                        }
                     }
                 }
 
@@ -368,6 +378,17 @@
             }
 
             return false;
+        }
+
+        private function loadExistedEventsTS(){
+            $sql = "SELECT `jegy_hu_id`, `ts` FROM `musor` WHERE `ido` > '".date('Y-m-d H:i:s')."'";
+            $rs  = $this->wpdb->get_results($sql);
+
+            if (is_array($rs)){
+                foreach ($rs as $row){
+                    $this->existedEventsTS[$row->jegy_hu_id] = $row->ts;
+                }
+            }
         }
 
         /**
@@ -802,7 +823,9 @@
             }
 
             foreach ($events as $event){
-                $this->saveMusor($event);
+                if ($event['LastModMax'] > $this->existedEventsTS[$event['NetEvent_Id']]){
+                    $this->saveMusor($event);
+                }
             }
         }
 
@@ -882,7 +905,8 @@
                                 `jegy_elfogyott`    = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
                                 `ar`                = '".$this->_e($ar)."',
                                 `dumaklub`          = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
-                                `status`            = '1'";
+                                `status`            = '1',
+                                `ts`                = '".$event['LastModMax']."'";
             $sql .= $where;
 
             if ($this->wpdb->query($sql) === false){
@@ -1124,6 +1148,13 @@
 
             if (!$this->isFieldInTable('jegy_hu_audit_id','musor')){
                 $sql = "ALTER TABLE `musor` ADD `jegy_hu_audit_id` VARCHAR(512) NOT NULL AFTER `jegy_hu_id`;";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
+                }
+            }
+
+            if (!$this->isFieldInTable('ts','musor')){
+                $sql = "ALTER TABLE `musor` ADD `ts` VARCHAR(512) NOT NULL AFTER `dumaklub`;";
                 if (!$this->wpdb->query($sql)){
                     throw new \EXception($this->wpdb->last_error.'!');
                 }
