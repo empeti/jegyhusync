@@ -3,6 +3,10 @@
  * @todo: címek mentése az előadásokhoz
  * @todo: műsorok mentése
  */
+/**
+ * @todo: címek mentése az előadásokhoz
+ * @todo: műsorok mentése
+ */
 
     namespace jegyhu;
 
@@ -108,7 +112,7 @@
 
                     // csak akkor kell szinkronolni a programokat, ha az előadás timestampje kisebb, mint a
                     // jegy.hu api-ban található timestamp
-                    if ($event['LastModMax'] > $this->existedEventsTS[$event['NetEvent_Id']]){
+                    if ($this->isEventTSUpdated($event['LastModMax'],$event['NetEvent_Id'])){
                         // program id - minden programot csak egyszer szinronizáljunk
                         if (!in_array($event['NetProgram_Id'],$programs)){
                             $programs[] = $event['NetProgram_Id'];
@@ -394,6 +398,26 @@
                 if ($row->Field == $field){
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        /**
+         * Megnézi módosult-e a timestamp az eventhez
+         *
+         * @param int $lastModMax
+         * @param int $netEventId
+         *
+         * @return bool
+         */
+        private function isEventTSUpdated($lastModMax, $netEventId){
+            if (empty($this->existedEventsTS[$netEventId])){
+                return true;
+            }
+
+            if ($lastModMax > $this->existedEventsTS[$netEventId]){
+                return true;
             }
 
             return false;
