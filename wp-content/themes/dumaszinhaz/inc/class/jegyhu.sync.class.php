@@ -18,6 +18,11 @@
         var $existedEventsTS;
 
         /**
+         * @var array ide gyűjtjük a jegy.hu API-ból listázott előadásokat, hogy tudjuk mik törlődtek
+         */
+        var $eventsInAPIList;
+
+        /**
          * @var array ide gyűjjük a színészek jegy.hu id-jához tartozó belső id-kat
          */
         var $personIDs;
@@ -97,7 +102,9 @@
              */
             if (is_array($results)){
                 foreach ($results['payload']['Events'] as $event){
-                    $events[] = $event;
+                    $events[]                = $event;
+                    $this->eventsInAPIList[] = $event['NetEvent_Id'];
+
 
                     // csak akkor kell szinkronolni a programokat, ha az előadás timestampje kisebb, mint a
                     // jegy.hu api-ban található timestamp
@@ -109,6 +116,7 @@
                     }
                 }
 
+                $this->deleteEvents();    // műsorszámok törlése API alapján
                 $this->syncPrograms($programs);  // előadások
                 $this->saveEvents($events);      // műsorok
             }
@@ -199,9 +207,6 @@
             foreach ($jegyHuVenues['payload']['venue_list'] as $nev => $adatok){
                 $existsInDB = false;
 
-                // @todo: vizsgálni kell az utolsó módosítás idejét mielőtt elkezdenénk a módosítást, majd ha bekerül az API-ba
-                $venue = $this->API->getVenue($nev);
-
                 if (!empty($venuesInDB[$adatok['id']])){
                     $existsInDB = true;
                 }
@@ -249,6 +254,20 @@
          */
         private function _e($str){
             return $this->wpdb->_real_escape($str);
+        }
+
+        /**
+         * Átállítja a jegy.hu API-ból már kimaradt előadások státuszát -1-re
+         */
+        private function deleteEvents(){
+            if (is_array($this->eventsInAPIList)){
+                $sql = "UPDATE `musor`
+                        SET `status` = '-1'
+                        WHERE
+                                `ido` > '".date('Y-m-d H:i:s')."'
+                            AND `jegy_hu_id` NOT IN ('".implode("','",$this->eventsInAPIList)."')";
+                $this->wpdb->query($sql);
+            }
         }
 
         /**
@@ -381,12 +400,14 @@
         }
 
         private function loadExistedEventsTS(){
-            $sql = "SELECT `jegy_hu_id`, `ts` FROM `musor` WHERE `ido` > '".date('Y-m-d H:i:s')."'";
+            $sql = "SELECT `jegy_hu_id`, `ts`, `status` FROM `musor` WHERE `ido` > '".date('Y-m-d H:i:s')."'";
             $rs  = $this->wpdb->get_results($sql);
 
             if (is_array($rs)){
                 foreach ($rs as $row){
-                    $this->existedEventsTS[$row->jegy_hu_id] = $row->ts;
+                    // ha az előadás státusza -1, mindenképp frissíteni kell
+                    $ts = $row->status == -1 ? 0 : $row->ts;
+                    $this->existedEventsTS[$row->jegy_hu_id] = $ts;
                 }
             }
         }
@@ -1079,31 +1100,6 @@
             // big
             if (!$this->isFieldInTable('big','eloadas_kepek')){
                 $sql = "ALTER TABLE `eloadas_kepek` ADD `big` VARCHAR(512) NOT NULL AFTER `medium`;";
-                if (!$this->wpdb->query($sql)){
-                    throw new \Exception($this->wpdb->last_error.'!');
-                }
-            }
-        }
-
-        /**
-         * Módosítja a helszinek táblát, ha szükséges
-         *
-         * @uses self::$wpdb
-         *
-         * @throws \Exception
-         */
-        private function updateTableHelyszinek(){
-            // jegy_hu_id
-            if (!$this->isFieldInTable('jegy_hu_id','helyszinek')){
-                $sql = "ALTER TABLE `helyszinek` ADD `jegy_hu_id` BIGINT NOT NULL AFTER `id`, ADD INDEX (`jegy_hu_id`) ;";
-                if (!$this->wpdb->query($sql)){
-                    throw new \Exception($this->wpdb->last_error.'!');
-                }
-            }
-
-            // last_mod
-            if (!$this->isFieldInTable('last_mod','helyszinek')){
-                $sql = "ALTER TABLE `helyszinek` ADD `last_mod` DATETIME NOT NULL ;";
                 if (!$this->wpdb->query($sql)){
                     throw new \Exception($this->wpdb->last_error.'!');
                 }
