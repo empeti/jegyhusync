@@ -85,7 +85,7 @@
             $events   = array();
             $programs = array();
 
-            $params = array('venues'=>array('Dumaszínház'),'per_page'=>200);
+            $params = array('venues'=>array('Dumaszínház'),'per_page'=>500);
 
             $results = $this->API->getEventList($params);
 
