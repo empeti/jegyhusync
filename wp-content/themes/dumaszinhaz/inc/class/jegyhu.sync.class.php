@@ -697,7 +697,7 @@
              */
             if (!empty($this->programIDs[$program['payload']['NetProgram_Id']])){
                 $sql    = " UPDATE ";
-                $where  = " WHERE `id` = '".$this->programIDs[$program['payload']['NeProgram_Id']]."'";
+                $where  = " WHERE `id` = '".$this->programIDs[$program['payload']['NetProgram_Id']]."'";
             }
             else{
                 $sql    = "INSERT INTO ";
