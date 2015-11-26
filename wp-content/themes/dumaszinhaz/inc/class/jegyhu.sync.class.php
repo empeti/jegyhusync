@@ -123,6 +123,7 @@
                 $this->deleteEvents();    // műsorszámok törlése API alapján
                 $this->syncPrograms($programs);  // előadások
                 $this->saveEvents($events);      // műsorok
+                $this->setAlkotoStatus();
             }
         }
 
@@ -150,8 +151,6 @@
                 );
 
                 $program = $this->API->getProgram($params);
-
-                echo '';
 
                 // előadás frissítése
                 $this->saveEloadas($program);
@@ -293,6 +292,30 @@
             }
 
             return $rs->id;
+        }
+
+        /**
+         * Visszaadja az aktív alkotók id-jeit egy tömbben
+         *
+         * @return array
+         */
+        private function getActiveAlkotoIds(){
+            $ids = array();
+
+            $sql = "SELECT
+                        ea.`alkoto_id`
+                   FROM
+                             `eloadas_alkoto` ea
+                        JOIN `musor` m ON m.`eloadas_id` = ea.`eloadas_id`
+                   WHERE
+                        m.`ido` > NOW()";
+            $rs = $this->wpdb->get_results($sql);
+
+            foreach ($rs as $row){
+                $ids[] = $row->alkoto_id;
+            }
+
+            return $ids;
         }
 
         /**
@@ -957,6 +980,22 @@
             if ($this->wpdb->query($sql) === false){
                 throw new \Exception($this->wpdb->last_error);
             }
+        }
+
+        /**
+         * Beállítja az alkotók státuszát attól függően, hogy vannak-e hozzá előadások a jövőben, vagy nem
+         */
+        private function setAlkotoStatus(){
+            // aktív alkotók id-jának legyűjtése
+            $aktivAlkotoIds = $this->getActiveAlkotoIds();
+
+            // aktív alkotók beállítása
+            $sql = "UPDATE `alkoto` SET `status` = '1' WHERE `id` IN (".implode(',',$aktivAlkotoIds).")";
+            $this->wpdb->query($sql);
+
+            // inaktív alkotók beállítása
+            $sql = "UPDATE `alkoto` SET `status` = '0' WHERE `id` NOT IN (".implode(',',$aktivAlkotoIds).")";
+            $this->wpdb->query($sql);
         }
 
         /**
