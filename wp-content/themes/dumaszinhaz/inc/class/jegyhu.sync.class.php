@@ -957,24 +957,25 @@
             }
 
             $sql .= " `musor` SET
-                                `helyszin_nev`      = '".$this->_e($event['AuditName'])."',
-                                `helyszin`          = '".$this->_e($helyszin)."',
-                                `varos`             = '".$this->_e($varos)."',
-                                `ido`               = '".$this->_e($event['EventDate'])."',
-                                `cim`               = '".$this->_e($event['ProgramName'])."',
-                                `seo`               = '".$this->_e($seo)."',
-                                `kiemelt_kep`       = '".$this->_e($event['ThumbURL'])."',
-                                `informacio`        = '".$this->_e($event['ShortDescription'])."',
-                                `jegyrendeles`      = '1',
-                                `jegy_hu_id`        = '".$this->_e($event['NetEvent_Id'])."',
-                                `jegy_hu_audit_id`  = '".$this->_e($event['NetAudit_Id'])."',
-                                `eloadas_id`        = '".$this->_e($this->programIDs[$event['NetProgram_Id']])."',
-                                `jegy_hu_status`    = '".$this->_e($event['EventStatus_Id'])."',
-                                `jegy_elfogyott`    = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
-                                `ar`                = '".$this->_e($ar)."',
-                                `dumaklub`          = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
-                                `status`            = '1',
-                                `ts`                = '".$event['LastModMax']."'";
+                                `helyszin_nev`              = '".$this->_e($event['AuditName'])."',
+                                `helyszin`                  = '".$this->_e($helyszin)."',
+                                `varos`                     = '".$this->_e($varos)."',
+                                `ido`                       = '".$this->_e($event['EventDate'])."',
+                                `cim`                       = '".$this->_e($event['ProgramName'])."',
+                                `seo`                       = '".$this->_e($seo)."',
+                                `kiemelt_kep`               = '".$this->_e($event['ThumbURL'])."',
+                                `informacio`                = '".$this->_e($event['ShortDescription'])."',
+                                `jegyrendeles`              = '1',
+                                `jegy_hu_id`                = '".$this->_e($event['NetEvent_Id'])."',
+                                `jegy_hu_audit_id`          = '".$this->_e($event['NetAudit_Id'])."',
+                                `eloadas_id`                = '".$this->_e($this->programIDs[$event['NetProgram_Id']])."',
+                                `jegy_hu_elerheto_jegyek`   = '".$event['LastAvailableTickets']."',
+                                `jegy_hu_status`            = '".$this->_e($event['EventStatus_Id'])."',
+                                `jegy_elfogyott`            = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
+                                `ar`                        = '".$this->_e($ar)."',
+                                `dumaklub`                  = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
+                                `status`                    = '1',
+                                `ts`                        = '".$event['LastModMax']."'";
             $sql .= $where;
 
             if ($this->wpdb->query($sql) === false){
@@ -1214,6 +1215,13 @@
 
             if (!$this->isFieldInTable('ts','musor')){
                 $sql = "ALTER TABLE `musor` ADD `ts` VARCHAR(512) NOT NULL AFTER `dumaklub`;";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
+                }
+            }
+
+            if (!$this->isFieldInTable('jegy_hu_elerheto_jegyek','musor')){
+                $sql = "ALTER TABLE `musor` ADD `jegy_hu_elerheto_jegyek` INT NOT NULL AFTER `jegy_hu_event_id`;";
                 if (!$this->wpdb->query($sql)){
                     throw new \EXception($this->wpdb->last_error.'!');
                 }
