@@ -869,6 +869,35 @@
 
                 }
             }
+            
+            // színészek mentése
+            if (is_array($p['Actors'])){
+                foreach ($p['Actors'] as $actor){
+                    /**
+                     * alkotó id meghatározása
+                     */
+
+                    // ha nincs még mentve a szinkronolt alkotók közé
+                    if (empty($this->personIDs[$actor['Actor_Id']])){
+                        // elmenti / módosítja az alkotót
+                        $this->saveAlkoto($actor);
+                    }
+
+                    // már szinkronolva lett, nem kell mégegyszer szinkronolni
+                    $alkotoId = $this->personIDs[$actor['Actor_Id']];
+
+                    $sql = "INSERT INTO `eloadas_alkoto` SET
+                                `eloadas_id`    = '".$this->_e($eloadasId)."',
+                                `szerepkor`     = '".$this->_e($actor['ActorType'])."',
+                                `nev`           = '".$this->_e($actor['LastName'].' '.$actor['FirstName'])."',
+                                `alkoto_id`     = '".$this->_e($alkotoId)."'";
+
+                    if (!$this->wpdb->query($sql)){
+                        throw new \Exception($this->wpdb->last_error);
+                    }
+
+                }
+            }
 
         }
 
