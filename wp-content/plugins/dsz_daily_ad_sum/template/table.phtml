@@ -1,0 +1,50 @@
+<h1>Budapesti előadások</h1>
+<table>
+    <tr>
+        <th>Összérték</th>
+        <th>Eladható jegyek száma</th>
+        <th>Költési limit</th>
+        <th>Időpont</th>
+        <th>Helyszín</th>
+        <th>Előadás címe</th>
+    </tr>
+    <?php if (!empty($budapestiEloadasok)):
+            if (is_array($budapestiEloadasok)):
+                foreach ($budapestiEloadasok as $bpEloadas):?>
+                    <tr>
+                        <td><?php echo $bpEloadas['osszertek']?></td>
+                        <td><?php echo $bpEloadas['eladhato_jegyek_szama']?></td>
+                        <td><?php echo $bpEloadas['koltesi_limit']?></td>
+                        <td><?php echo $bpEloadas['idopont']?></td>
+                        <td><?php echo $bpEloadas['helyszin']?></td>
+                        <td><?php echo $bpEloadas['cim']?></td>
+                    </tr>
+    <?php       endforeach;
+            endif;
+        endif;?>
+</table>
+
+<h1>Vidéki előadások</h1>
+<table>
+    <tr>
+        <th>Összérték</th>
+        <th>Eladható jegyek száma</th>
+        <th>Időpont</th>
+        <th>Helyszín</th>
+        <th>Előadás címe</th>
+    </tr>
+    <?php if (!empty($videkiEloadasok)):
+            if (is_array($videkiEloadasok)):
+                foreach ($videkiEloadasok as $videkiEloadas):?>
+                    <tr>
+                        <td><?php echo $videkiEloadas['osszertek']?></td>
+                        <td><?php echo $videkiEloadas['eladhato_jegyek_szama']?></td>
+                        <td><?php echo $videkiEloadas['koltesi_limit']?></td>
+                        <td><?php echo $videkiEloadas['idopont']?></td>
+                        <td><?php echo $videkiEloadas['helyszin']?></td>
+                        <td><?php echo $videkiEloadas['cim']?></td>
+                    </tr>
+    <?php       endforeach;
+        endif;
+    endif;?>
+</table>
