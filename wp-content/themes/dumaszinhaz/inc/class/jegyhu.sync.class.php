@@ -1210,7 +1210,7 @@
         }
 
         /**
-         * Módosítja a helszinek táblát, ha szükséges
+         * Módosítja a musor táblát, ha szükséges
          *
          * @uses self::$wpdb
          *
