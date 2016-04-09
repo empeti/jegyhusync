@@ -1274,6 +1274,11 @@
             }
 
             if (!$this->isFieldInTable('max_ar','musor')){
+                $sql = "UPDATE TABLE `musor` SET `ts` = '0' WHERE `ido` > NOW()";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
+                }
+
                 $sql = "ALTER TABLE `musor` ADD `max_ar` INT NOT NULL AFTER `ar`;";
                 if (!$this->wpdb->query($sql)){
                     throw new \EXception($this->wpdb->last_error.'!');
