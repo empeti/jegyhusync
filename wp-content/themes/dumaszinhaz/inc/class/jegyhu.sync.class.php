@@ -1,13 +1,4 @@
 <?php
-/**
- * @todo: címek mentése az előadásokhoz
- * @todo: műsorok mentése
- */
-/**
- * @todo: címek mentése az előadásokhoz
- * @todo: műsorok mentése
- */
-
     namespace jegyhu;
 
     class sync{
