@@ -1,0 +1,75 @@
+<?php
+    DAS::save_options();
+
+    $emails                 = DAS::get_option('dsz_das_emails');
+    $weeks_nr               = DAS::get_option('dsz_das_weeks_nr',4);
+    $daily_limit_multiplier = DAS::get_option('dsz_das_daily_limit_multiplier','0.07');
+?>
+<div class="wrap">
+    <h2>Dumaszínház napi hírdetés összesítő</h2>
+    <br />
+
+    <!-- Tabok -->
+        <h2>
+            <a class="nav-tab <?php if (empty($_REQUEST['tab']) || $_REQUEST['tab'] == 'settings') echo ' nav-tab-active'?>"
+               href="options-general.php?page=dsz-daily-ad-sum&tab=settings">
+                <?php echo __('Beállítások')?>
+            </a>
+            <a class="nav-tab <?php if (!empty($_REQUEST['tab']) && $_REQUEST['tab'] == 'preview') echo ' nav-tab-active'?>"
+               href="options-general.php?page=dsz-daily-ad-sum&tab=preview">
+                <?php echo __('Előnézet')?>
+            </a>
+        </h2>
+    <!-- Tabok vége -->
+
+    <?php if (empty($_REQUEST['tab']) || $_REQUEST['tab'] == 'settings'):?>
+        <form action="options-general.php?page=dsz-daily-ad-sum" method="post">
+            <?php
+                settings_fields('dsz-das-options');
+                do_settings_sections('dsz-das-options');
+            ?>
+            <table class="form-table">
+                <tr valign="middle">
+                    <th scope="row">E-mail címek <br />(vesszővel elválasztva)</th>
+                    <td>
+                        <input
+                            name="dsz_das_emails"
+                            value="<?php echo $emails?>"
+                            style="width: 90%"
+                        />
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th scope="row">Hetek száma</th>
+                    <td>
+                        <select name="dsz_das_weeks_nr">
+                            <option value="2" <?php echo $weeks_nr == '2'?'selected':''?>> 2 </option>
+                            <option value="3" <?php echo $weeks_nr == '3'?'selected':''?>> 3 </option>
+                            <option value="4" <?php echo $weeks_nr == '4'?'selected':''?>> 4 </option>
+                            <option value="5" <?php echo $weeks_nr == '5'?'selected':''?>> 5 </option>
+                            <option value="6" <?php echo $weeks_nr == '6'?'selected':''?>> 6 </option>
+                            <option value="7" <?php echo $weeks_nr == '7'?'selected':''?>> 7 </option>
+                            <option value="8" <?php echo $weeks_nr == '8'?'selected':''?>> 8 </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr valign="middle">
+                    <th scope="row">Napi költési limit szorzó</th>
+                    <td>
+                        <input
+                            name="dsz_das_daily_limit_multiplier"
+                            value="<?php echo $daily_limit_multiplier?>"
+                        />
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="save" value="1" />
+            <?php submit_button(__('Mentés'))?>
+        </form>
+    <?php elseif ($_REQUEST['tab'] == 'preview'):?>
+        <?php
+            $DAS = new DAS();
+            $DAS->print_table();
+        ?>
+    <?php endif;?>
+</div>

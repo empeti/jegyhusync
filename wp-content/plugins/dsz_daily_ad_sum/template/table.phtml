@@ -1,0 +1,70 @@
+<style>
+    .das table{
+        border-collapse: collapse;
+    }
+    .das td, .das th{
+        border: 1px solid gray;
+        padding: 5px;
+        font: 12px Arial;
+    }
+    .das th{
+        font-weight: bolder;
+        background: #e0e0e0;
+    }
+    .das .right{
+        text-align: right;
+    }
+</style>
+<div class="das">
+    <h1>Budapesti előadások</h1>
+    <table cellspacing="0">
+        <tr>
+            <th>Összérték</th>
+            <th>Eladható jegyek száma</th>
+            <th>Költési limit</th>
+            <th>Időpont</th>
+            <th>Helyszín</th>
+            <th>Előadás címe</th>
+        </tr>
+        <?php if (!empty($budapestiEloadasok)):
+            if (is_array($budapestiEloadasok)):
+                foreach ($budapestiEloadasok as $bpEloadas):?>
+                    <tr>
+                        <td class="right"><?php echo $bpEloadas['osszertek']?></td>
+                        <td class="right"><?php echo $bpEloadas['eladhato_jegyek_szama']?></td>
+                        <td class="right"><?php echo $bpEloadas['koltesi_limit']?></td>
+                        <td><?php echo $bpEloadas['idopont']?></td>
+                        <td><?php echo $bpEloadas['helyszin']?></td>
+                        <td><?php echo $bpEloadas['cim']?></td>
+                    </tr>
+                <?php       endforeach;
+            endif;
+        endif;?>
+    </table>
+
+    <h1>Vidéki előadások</h1>
+    <table cellspacing="0">
+        <tr>
+            <th>Összérték</th>
+            <th>Eladható jegyek száma</th>
+            <th>Költési limit</th>
+            <th>Időpont</th>
+            <th>Helyszín</th>
+            <th>Előadás címe</th>
+        </tr>
+        <?php if (!empty($videkiEloadasok)):
+            if (is_array($videkiEloadasok)):
+                foreach ($videkiEloadasok as $videkiEloadas):?>
+                    <tr>
+                        <td class="right"><?php echo $videkiEloadas['osszertek']?></td>
+                        <td class="right"><?php echo $videkiEloadas['eladhato_jegyek_szama']?></td>
+                        <td class="right"><?php echo $videkiEloadas['koltesi_limit']?></td>
+                        <td><?php echo $videkiEloadas['idopont']?></td>
+                        <td><?php echo $videkiEloadas['helyszin']?></td>
+                        <td><?php echo $videkiEloadas['cim']?></td>
+                    </tr>
+                <?php       endforeach;
+            endif;
+        endif;?>
+    </table>
+</div>
