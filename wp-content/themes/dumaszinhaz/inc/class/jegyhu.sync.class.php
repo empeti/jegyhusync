@@ -303,12 +303,13 @@
             $ids = array();
 
             $sql = "SELECT
-                        ea.`alkoto_id`
+                        DISTINCT (ea.`alkoto_id`)
                    FROM
                              `eloadas_alkoto` ea
                         JOIN `musor` m ON m.`eloadas_id` = ea.`eloadas_id`
                    WHERE
-                        m.`ido` > NOW()";
+                        m.`ido` > NOW() 
+                        AND m.`status` != '-1'";
             $rs = $this->wpdb->get_results($sql);
 
             foreach ($rs as $row){
