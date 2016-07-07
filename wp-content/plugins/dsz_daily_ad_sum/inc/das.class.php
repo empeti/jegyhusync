@@ -251,6 +251,7 @@
         private function get_table_data($locType){
             $rows       = array();
             $sortedRows = array();
+            $osszertek  = array();
 
             $weeksNr                = DAS::get_option('dsz_das_weeks_nr');
 
@@ -262,7 +263,7 @@
                     WHERE
                                 `jegy_hu_elerheto_jegyek` > 0
                             AND `ido` < '".date('Y-m-d H:i:s',strtotime('+'.$weeksNr.' week'))."'
-                            AND `ido` >= '".date('y-m-d H:i:s',strtotime('+1 day'))."'
+                            AND `ido` >= '".date('Y-m-d H:i:s',strtotime('+1 day'))."'
                             AND `varos` ".($locType == 'bp'?" = 'Budapest'":"!= 'Budapest'");
             $rs  = $this->db->get_results($sql);
 
@@ -287,17 +288,19 @@
                 }
             }
 
-            // rendezés
-            array_multisort($osszertek, SORT_DESC, $ido, SORT_ASC,$rows);
+            if (count( $osszertek ) > 0){
+                // rendezés
+                array_multisort($osszertek, SORT_DESC, $ido, SORT_ASC,$rows);
 
-            // limit
-            if (is_array($rows)){
-                $i = 0;
-                foreach ($rows as $row){
-                    if ($i < 20){
-                        $sortedRows[] = $row;
+                // limit
+                if (is_array($rows)){
+                    $i = 0;
+                    foreach ($rows as $row){
+                        if ($i < 20){
+                            $sortedRows[] = $row;
+                        }
+                        $i++;
                     }
-                    $i++;
                 }
             }
 
