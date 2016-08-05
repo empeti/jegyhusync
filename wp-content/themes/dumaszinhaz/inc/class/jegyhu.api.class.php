@@ -80,7 +80,7 @@
             599 => "Network connect timeout error");
 
         // API URI
-        var $URI = 'http://elesteszt2.jegy.hu/api';
+        var $URI = 'http://dumaszinhaz.jegy.hu/api';
 
         // API verzió
         var $version = 2;
