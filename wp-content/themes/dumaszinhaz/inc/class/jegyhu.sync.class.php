@@ -1,13 +1,4 @@
 <?php
-/**
- * @todo: címek mentése az előadásokhoz
- * @todo: műsorok mentése
- */
-/**
- * @todo: címek mentése az előadásokhoz
- * @todo: műsorok mentése
- */
-
     namespace jegyhu;
 
     class sync{
@@ -533,7 +524,7 @@
                     if($row->{'Tables_in_'.$this->wpdb->dbname} == $oldName){
                         $sql = "RENAME TABLE `".$this->_e($oldName)."` TO `".$this->_e($newName)."`";
                         if (!$this->wpdb->query($sql)){
-                            throw new \Exception($this->wpdb->last_error);
+                            throw new \Exception($this->wpdb->last_error." ".$sql);
                         }
                     }
                 }
@@ -548,6 +539,7 @@
          * @throws \Exception
          */
         private function saveAlkoto($creator){
+            echo '';
 
             /**
              * Adatok ellenőrzése
@@ -604,7 +596,7 @@
             $sql .= $where;
 
             if ($this->wpdb->query($sql) === false){
-                throw new \Exception(' '.$this->wpdb->last_error);
+                throw new \Exception(' '.$this->wpdb->last_error.' '.$sql);
             }
 
             $alkotoId = $this->getAlkotoIdByActorId($creator['Actor_Id']);
@@ -756,7 +748,8 @@
 
             // mentés az árak közé
             if (empty($this->prices[$p['NetProgram_Id']])){
-                $this->prices[$p['NetProgram_Id']] = $p['MinPrice'];
+                $this->prices[$p['NetProgram_Id']]['min'] = $p['MinPrice'];
+                $this->prices[$p['NetProgram_Id']]['max'] = $p['MaxPrice'];
             }
         }
 
@@ -964,7 +957,13 @@
             $ar = 0;
             if (!empty($this->prices[$event['NetProgram_Id']])){
                 $ar = str_replace(' ','',
-                        str_replace('Ft','',$this->prices[$event['NetProgram_Id']]));
+                        str_replace('Ft','',$this->prices[$event['NetProgram_Id']]['min']));
+            }
+
+            $maxAr = 0;
+            if (!empty($this->prices[$event['NetProgram_Id']])){
+                $maxAr = str_replace(' ','',
+                        str_replace('Ft','',$this->prices[$event['NetProgram_Id']]['max']));
             }
 
             // seo url generálás
@@ -1003,6 +1002,7 @@
                                 `jegy_hu_status`            = '".$this->_e($event['EventStatus_Id'])."',
                                 `jegy_elfogyott`            = '".($event['TicketAvailable'] == 'N'?'1':'0')."',
                                 `ar`                        = '".$this->_e($ar)."',
+                                `max_ar`                    = '".$this->_e($maxAr)."',
                                 `dumaklub`                  = '".(preg_match('/dumaklub/i',$event['AuditName'])?'1':'0')."',
                                 `gyermekeloadas`            = '".(preg_match('/gyermekelőadás/i',$event['ShortDescription'])?'1':'0')."',
                                 `status`                    = '1',
@@ -1202,7 +1202,7 @@
         }
 
         /**
-         * Módosítja a helszinek táblát, ha szükséges
+         * Módosítja a musor táblát, ha szükséges
          *
          * @uses self::$wpdb
          *
@@ -1264,5 +1264,19 @@
                     throw new \EXception($this->wpdb->last_error.'!');
                 }
             }
+
+            if (!$this->isFieldInTable('max_ar','musor')){
+                $sql = "UPDATE `musor` SET `ts` = '0' WHERE `ido` > NOW()";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
+                }
+
+                $sql = "ALTER TABLE `musor` ADD `max_ar` INT NOT NULL AFTER `ar`;";
+                if (!$this->wpdb->query($sql)){
+                    throw new \EXception($this->wpdb->last_error.'!');
+                }
+            }
+
+
         }
     }

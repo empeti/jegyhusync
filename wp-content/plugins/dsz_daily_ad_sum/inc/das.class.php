@@ -89,8 +89,8 @@
 
             if (is_array($tableData)){
                 foreach ($tableData as $row){
-                    if ($row['gyerek_eloadas'] != '1' && $row['hatralevo_napok_szama'] >= 2){
-                        return $row['id'];
+                    if ($row->gyerek_eloadas != '1' && $row->hatralevo_napok_szama >= 2){
+                        return $row->id;
                     }
                 }
             }
@@ -263,7 +263,7 @@
                     WHERE
                                 `jegy_hu_elerheto_jegyek` > 0
                             AND `ido` < '".date('Y-m-d H:i:s',strtotime('+'.$weeksNr.' week'))."'
-                            AND `ido` >= '".date('Y-m-d H:i:s',strtotime('+1 day'))."'
+                            AND `ido` >= '".date('y-m-d H:i:s',strtotime('+1 day'))."'
                             AND `varos` ".($locType == 'bp'?" = 'Budapest'":"!= 'Budapest'");
             $rs  = $this->db->get_results($sql);
 
