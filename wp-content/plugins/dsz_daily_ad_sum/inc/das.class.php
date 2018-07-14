@@ -89,8 +89,8 @@
 
             if (is_array($tableData)){
                 foreach ($tableData as $row){
-                    if ($row->gyerek_eloadas != '1' && $row->hatralevo_napok_szama >= 2){
-                        return $row->id;
+                    if ($row['gyerek_eloadas'] != '1' && $row['hatralevo_napok_szama'] >= 2){
+                        return $row['id'];
                     }
                 }
             }
@@ -272,7 +272,7 @@
                     foreach ($rs as $row){
                         $ertek       = $this->get_musor_osszertek($row);
                         $osszertek[] = $ertek;
-                        $ido[]       = $rs['ido'];
+                        $ido[]       = $row->ido;
                         $rows[] = array(
                             'id'                    => $row->id,
                             'osszertek'             => $ertek,
